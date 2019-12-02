@@ -6,6 +6,9 @@
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/gmall-logger/pom.xml" />
+        <option value="$PROJECT_DIR$/gmall-publisher/pom.xml" />
+        <option value="$PROJECT_DIR$/../gmall0624-parent/dw-chart/pom.xml" />
+        <option value="$PROJECT_DIR$/gmall-canal/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

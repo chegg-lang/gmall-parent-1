@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSON
 import com.atguigu.gmall.bean.StartUpLog
 import com.atguigu.gmall.common.constant.GmallConstant
 import com.atguigu.gmall.realtime.util.MyKafkaUtil
+import org.apache.hadoop.conf.Configuration
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.spark.SparkConf
 import org.apache.spark.broadcast.Broadcast
@@ -15,7 +16,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.dstream.{DStream, InputDStream}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import redis.clients.jedis.Jedis
-
+import org.apache.phoenix.spark._ //引入的是隐式转换的包
 object DauApp {
 
   def main(args: Array[String]): Unit = {
@@ -101,21 +102,17 @@ object DauApp {
         for (startuplog <- startuplogItr) {
           val dateKey:String = "dau:" + startuplog.logDate   //以日期字段作为主要的日活指标
           jedis.sadd(dateKey,startuplog.mid)
-
         }
         jedis.close()
-      }
-      )
-
-//      filtered2Dstream.foreachRDD{rdd=>
-//        //ctrl +shift +u 切换大小写
-//        rdd.saveToPhoenix("GMALL0624_DAU",Seq("MID", "UID", "APPID", "AREA", "OS", "CH", "TYPE", "VS", "LOGDATE", "LOGHOUR", "TS"),new Configuration ,Some("hadoop1,hadoop2,hadoop3:2181"))
-//      }
-
-//      rdd.foreach(startuplog => {          //性能差，每条数据都产生相关连接对象及资源
-      ////
-      ////      })
+      })
     }
+
+    filtered2Dstream.foreachRDD{rdd=>      //foreachRDD的作用：
+      //ctrl +shift +u 切换大小写
+      rdd.saveToPhoenix("GMALL2019_DAU",Seq("MID", "UID", "APPID",
+        "AREA", "OS", "CH", "TYPE", "VS", "LOGDATE", "LOGHOUR", "TS"),
+        new Configuration ,Some("hadoop102,hadoop103,hadoop104:2181"))
+  }
     ssc.start()
     ssc.awaitTermination()
   }
